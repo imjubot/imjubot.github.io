@@ -200,10 +200,10 @@
                     } else {
                         if(alphabet.includes(x)){
                             regexarr.push(`([${replaces.split("\n")[alphabet.indexOf(x)]}][\\W_]*?)+`)
-                            regexarra.push(`([${replaces.split("\n")[alphabet.indexOf(x)]}]\!)+`)
+                            regexarra.push(`([${replaces.split("\n")[alphabet.indexOf(x)]}]\\!)+`)
                         } else if(alphabetupper.includes(x)){
                             regexarr.push(`([${replaces.split("\n")[alphabetupper.indexOf(x)]}][\\W_]*?)+`)
-                            regexarra.push(`([${replaces.split("\n")[alphabetupper.indexOf(x)]}]\!)+`)
+                            regexarra.push(`([${replaces.split("\n")[alphabetupper.indexOf(x)]}]\\!)+`)
                         } else {
                             if(num === 0 || nomatch.includes(x)){
                                 regexarr.push(x)
@@ -214,7 +214,7 @@
                                     regexarra.push(x)
                                 } else {
                                     regexarr.push(`(${x}[\\W_]*?)+`)
-                                    regexarra.push(`(${x}\!)+`)
+                                    regexarra.push(`(${x}\\!)+`)
                                 }
                             }
                         }
