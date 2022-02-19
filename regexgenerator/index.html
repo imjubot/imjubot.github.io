@@ -16,6 +16,12 @@
         <center>
             <input id="textinput" type="text" placeholder="Insert Text" minlength="1" oninput="submitregex()">
         </center>
+        <br>
+        <div id="regopts" style="text-transform: none; font-size: 15px;">
+            <center>
+                <input id="regi" type="checkbox" checked onclick="submitregex()"><h>Case Insensitive</h> - <input id="regb" type="checkbox" checked onclick="submitregex()"><h>Word \b</h> - <input id="regw" type="checkbox" onclick="submitregex()"><h>Word \w</h>
+            </center>
+        </div>
     </div>
     <br>
     <div style="border: solid; padding: 10px;">
@@ -76,9 +82,9 @@
                 </div>
                 <br>
                 <div style="text-transform: none; font-size: 15px;">
-                    <input type="checkbox"><h>Case Insensitive</h>
+                    <input id="caseinsensitive" type="checkbox" oninput="checkbox(this)"><h>Case Insensitive</h>
                     <br>
-                    <input type="checkbox"><h>Ignore Spaces</h>
+                    <input id="ignorespaces" type="checkbox"><h>Ignore Spaces</h>
                 </div>
                 <br>
                 <div>
@@ -151,11 +157,10 @@
         replaces = newdata
     }
 
-    let regex = "config:any regi:"
-    let regexraw = ""
     let regexarr = []
     let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
-    let nomatch = ["(", ")"]
+    let nomatch = ["(", ")", "[", "]", "{", "}", ":", "$", "+", "*", "?", "\\s", "\\", "|", "^", "-", ">", "<", ".", "?#", "?&", "?P=", "?P>", "?<=", "?<!", "?=", "\\w", "\\b"]
+    let matchextra = [":", ".", "+", "*", "?", "\\"]
 
     function submitregex(){
         let regextext = document.getElementById("textinput").value
@@ -167,43 +172,64 @@
                     if(num === 0 || nomatch.includes(regexarr[num-1])){
                         regexarr.push("\\s*")
                     } else {
-                        if(regexarr[num-1].endsWith("+[\\W_]*")){
-                            regexarr[num-1] = regexarr[num-1].split("+[\\W_]*")[0]
+                        if(regexarr[num-1].endsWith("[\\W_]*?)")){
+                            // regexarr[num-1] = regexarr[num-1].split("[\\W_]*?)")[0]
                         } 
-                        regexarr.push("+\\s")
+                        regexarr.push("+\\s*")
                     }
                 } else {
                     if(alphabet.includes(x)){
                         if(num === 0 || nomatch.includes(regexarr[num-1])){
-                            regexarr.push(`[${replaces.split("\n")[alphabet.indexOf(x)].split(" ")[0]}]+[\\W_]*`)
+                            regexarr.push(`([${replaces.split("\n")[alphabet.indexOf(x)].split(" ")[0]}][\\W_]*?)`)
                         } else {
-                            regexarr.push(`+[${replaces.split("\n")[alphabet.indexOf(x)].split(" ")[0]}]+[\\W_]*`)
+                            regexarr.push(`+([${replaces.split("\n")[alphabet.indexOf(x)].split(" ")[0]}][\\W_]*?)`)
                         }
                     } else {
                         if(num === 0 || nomatch.includes(regexarr[num-1])){
-                            if((x === "(") || (x === ")")){
+                            if(nomatch.includes(x)){
                                 regexarr.push(x)
                             } else {
-                                regexarr.push(`${x}+[\\W_]*`)
+                                regexarr.push(`(${x}[\\W_]*?)`)
                             }
                         } else {
-                            if((x === "(") || (x === ")")){
+                            if(nomatch.includes(x)){
                                 regexarr.push(x)
                             } else {
-                                regexarr.push(`+${x}+[\\W_]*`)
+                                regexarr.push(`+(${x}[\\W_]*?)`)
                             }
                         }
                     }
                 }
                 num++
             })
-            document.getElementById("regexoutput").innerHTML = `config:any regi:${regexarr.join("")}`
+
+            function checkregi(){return document.getElementById("regi").checked === true ? "(?i)" : ""}
+            function checkregia(){return document.getElementById("regi").checked === true ? "i" : ""}
+            function checkwordb(){return document.getElementById("regb").checked === true ? "\\b" : ""}
+            function checkwordw(){return document.getElementById("regw").checked === true ? "\\w" : ""}
+            function checkwordbw(){return checkwordb() + checkwordw()}
+
+            if(checkwordw() !== ""){
+                regexarr.unshift(checkwordw())
+                regexarr.push(checkwordw())
+            }
+
+            if(checkwordb() !== ""){
+                regexarr.unshift(checkwordb())
+                regexarr.push(checkwordb())
+            }
+
+            if(checkregi() !== ""){
+                regexarr.unshift(checkregi())
+            }
+
+            document.getElementById("regexoutput").innerHTML = `config:any reg${checkregia()}:${regexarr.join("")}`
             document.getElementById("regexrawoutput").innerHTML = `${regexarr.join("")}`
         }
     }
     
     function copyregex(){
-        navigator.clipboard.writeText(`config:any regi:${regexarr.join("")}`);
+        navigator.clipboard.writeText(`config:any reg${checkregia()}:${regexarr.join("")}`);
         let colorfirst = document.getElementById("regexcopy").style.backgroundColor
         document.getElementById("regexcopy").style.backgroundColor = "green"
         setTimeout(() => {
@@ -235,15 +261,26 @@
         if(document.getElementById("changer").value.length > 0){
             changer = document.getElementById("changer").value
         }
-
-        let caseinsensitive = 0
-        let ignorespaces = 0
         
+        if(document.getElementById("caseinsensitive").checked === true){
+            replacetext = replacetext.toLowerCase()
+            replacer = replacer.toLowerCase()
+        }
+
+        if(document.getElementById("ignorespaces").checked === true){
+            replacetext = replacetext.replace(/(\s)/g, "")
+            replacer = replacer.replace(/(\s)/g, "")
+        }
 
         let output = replacetext.replace(RegExp(replacer.toString(), "g"), changer)
         // console.log(replacetext, replacer, changer)
 
         document.getElementById("replaceoutput").innerHTML = output
-
     }
+
+    function checkbox(elem){
+        // alert(elem.checked)
+        replacer()
+    }
+
 </script>
