@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>RegexGenerator</title>
+    <link rel="icon" href="../../src/favicon.ico" type="image/x-icon">
+</head>
+<body style="background-color: #1d3956; color: mediumseagreen; font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; text-transform: uppercase; font-size: 20px;">
+    <div>
+        <center>
+            <h1>
+                Regex Generator
+            </h1>
+        </center>
+    </div>
+    <div class="input">
+        <center>
+            <input id="textinput" type="text" placeholder="Insert Text" minlength="1" oninput="submitregex()">
+        </center>
+    </div>
+    <br>
+    <div style="border: solid; padding: 10px;">
+        <center>
+            <h id="regexoutput" style="text-transform: none;">
+                Regex shows up here
+            </h>
+            <button id="regexcopy" onclick="copyregex()">
+                Copy Regex
+            </button>
+            <br>
+            <br>
+            <h id="regexrawoutput" style="text-transform: none;">
+                Raw Regex shows up here
+            </h>
+            <button id="regexcopyraw" onclick="copyregexraw()">
+                Copy Raw Regex
+            </button>
+            <br>
+        </center>
+    </div>
+    <br>
+    <h3>
+        <center>Lookalikes</center>
+    </h3>
+    <div style="user-select: none;">
+        <h>Usage:</h>
+        <br>
+        <h>1. <a href="./replaces.txt" download="replaces.txt">Download the Standart File</a></h>
+        <br>
+        <h>2. Drop your edited File on this page</h>
+        <br>
+    </div>
+    <br>
+    <h>Replaces:</h>
+    <br><br>
+    <button style="background-color: red;" onclick="resetreplace()">Reset Replaces</button>
+    <br>
+    <textarea id="embedreplace" style="height: 390px; background-color: darkcyan;" oninput="changereplace()" spellcheck="false">Loading Replaces..</textarea>
+</body>
+</html>
+
+
+<script>
+    document.onload = syncreplaces()
+
+    document.addEventListener("drop", function(ev){
+        customreplace(event)
+    })
+
+    document.addEventListener("dragover", function(ev){
+        customdrag(event)
+    })
+
+    let replaces = ""
+
+    function resetreplace(){
+        syncreplaces()
+    }
+    
+    function customreplace(ev){
+        // console.log("file dropped")
+        ev.preventDefault();
+        if(ev.dataTransfer.items[0].type === "text/plain"){
+            let file = ev.dataTransfer.files[0]
+            let reader = new FileReader()
+            reader.onload = function(event){
+                replaces = event.target.result.replace(/(\r)/g, "")
+                document.getElementById("embedreplace").value = replaces
+            }
+            reader.readAsText(file)
+            // console.log(file)
+        }
+    }
+
+    function customdrag(ev){
+        // console.log("file dragged")
+        ev.preventDefault()
+    }
+    
+    function syncreplaces(){
+        fetch("./replaces.txt")
+        .then(data => {
+            data.text().then(x => {
+                // console.log(x)
+                replaces = x.replace(/(\r)/g, "")
+                document.getElementById("embedreplace").value = x.replace(/(\r)/g, "")
+                console.log("Successfully Fetched Lookalikes")
+            })
+        })
+        .catch(err => {
+            location.reload()
+            console.log("Failed to Fetch Lookalikes - Reloading")
+        })
+    }
+
+    function changereplace(){
+        let newdata = document.getElementById("embedreplace").value
+        replaces = newdata
+        // console.log(replaces)
+    }
+
+    let regex = "config:any regi:"
+    let regexraw = ""
+    let regexarr = []
+    let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
+    let nomatch = ["(", ")"]
+
+    function submitregex(){
+        let regextext = document.getElementById("textinput").value
+        regexarr = []
+        if(regextext.length > 0){
+            let num = 0
+            regextext.split("").forEach(x => {
+                if(x === " "){
+                    if(num === 0 || nomatch.includes(regexarr[num-1])){
+                        regexarr.push("\\s*")
+                    } else {
+                        if(regexarr[num-1].endsWith("+[\\W_]*")){
+                            regexarr[num-1] = regexarr[num-1].split("+[\\W_]*")[0]
+                        } 
+                        regexarr.push("+\\s")
+                    }
+                } else {
+                    if(alphabet.includes(x)){
+                        if(num === 0 || nomatch.includes(regexarr[num-1])){
+                            console.log(replaces.split("\n")[alphabet.indexOf(x)].split(" ")[0])
+                            regexarr.push(`[${replaces.split("\n")[alphabet.indexOf(x)].split(" ")[0]}]+[\\W_]*`)
+                        } else {
+                            regexarr.push(`+[${replaces.split("\n")[alphabet.indexOf(x)].split(" ")[0]}]+[\\W_]*`)
+                        }
+                    } else {
+                        if(num === 0 || nomatch.includes(regexarr[num-1])){
+                            if((x === "(") || (x === ")")){
+                                regexarr.push(x)
+                            } else {
+                                regexarr.push(`${x}+[\\W_]*`)
+                            }
+                        } else {
+                            if((x === "(") || (x === ")")){
+                                regexarr.push(x)
+                            } else {
+                                regexarr.push(`+${x}+[\\W_]*`)
+                            }
+                        }
+                    }
+                }
+                num++
+            })
+            document.getElementById("regexoutput").innerHTML = `config:any regi:${regexarr.join("")}`
+            document.getElementById("regexrawoutput").innerHTML = `${regexarr.join("")}`
+        }
+    }
+    
+    function copyregex(){
+        navigator.clipboard.writeText(`config:any regi:${regexarr.join("")}`);
+        let colorfirst = document.getElementById("regexcopy").style.backgroundColor
+        document.getElementById("regexcopy").style.backgroundColor = "green"
+        setTimeout(() => {
+            document.getElementById("regexcopy").style.backgroundColor = colorfirst
+        }, 3000)
+    }
+
+    function copyregexraw(){
+        navigator.clipboard.writeText(`${regexarr.join("")}`);
+        let colorfirsta = document.getElementById("regexcopyraw").style.backgroundColor
+        document.getElementById("regexcopyraw").style.backgroundColor = "green"
+        setTimeout(() => {
+            document.getElementById("regexcopyraw").style.backgroundColor = colorfirsta
+        }, 3000)
+    }
+</script>
