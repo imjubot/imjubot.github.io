@@ -38,29 +38,62 @@
         </center>
     </div>
     <br>
-    <h3>
-        <center>Lookalikes</center>
-    </h3>
-    <div style="user-select: none;">
+    <div style="user-select: none; float: left; width: 50%;">
+        <center>
+        <h3 style="text-decoration: underline;">Lookalikes:</h3>
         <h>Usage:</h>
         <br>
-        <h>1. <a href="./replaces.txt" download="replaces.txt">Download the Standart File</a></h>
+        <h>1. <a href="./replaces.txt" download="replaces.txt">Download the Standard File</a></h>
         <br>
         <h>2. Drop your edited File on this page</h>
         <br>
+        <br>
+        <h>Replaces:</h>
+        <br><br>
+        <textarea id="embedreplace" style="height: 400px; width: 300px; background-color: darkcyan;" oninput="changereplace()" spellcheck="false">Loading Replaces..</textarea>
+        <br><br>
+        <button style="background-color: red;" onclick="resetreplace()">Reset Replaces</button>
+        </center>
     </div>
-    <br>
-    <h>Replaces:</h>
-    <br><br>
-    <button style="background-color: red;" onclick="resetreplace()">Reset Replaces</button>
-    <br>
-    <textarea id="embedreplace" style="height: 390px; background-color: darkcyan;" oninput="changereplace()" spellcheck="false">Loading Replaces..</textarea>
+    <div style="user-select: none; float: right; width: 50%;">
+        <center>
+            <h3 style="text-decoration: underline;">Extras:</h3>
+            <div style="border: double; padding: 10px; padding-top: 5px; padding-bottom: 5px; display: inline-block; ">
+                <div style="float: left;">
+                    <br>
+                    <h style="text-decoration: underline; ">Replacer:</h>
+                    <input id="replacer" type="text" style="width: 203px; background-color: aquamarine; border: none;" placeholder="Leave Empty for nothing" oninput="replacer()">
+                </div>
+                <br>
+                <div style="float: left;">
+                    <h style="text-decoration: underline;">Changer:</h>
+                    <input id="changer" type="text" style="width: 207px; background-color: darkcyan; border: none;" placeholder="Leave Empty for nothing" oninput="replacer()">
+                </div>
+                <br>
+                <div style="float: left;">
+                    <h style="text-decoration: underline;">Text:</h>
+                    <input id="replacetext" type="text" style="width: 250px; background-color: aquamarine; border: none;" placeholder="Lorem ipsum..." oninput="replacer()">
+                </div>
+                <br>
+                <div style="text-transform: none; font-size: 15px;">
+                    <input type="checkbox"><h>Case Insensitive</h>
+                    <br>
+                    <input type="checkbox"><h>Ignore Spaces</h>
+                </div>
+                <br>
+                <div>
+                    <form id="replaceoutput" style="text-transform: none; user-select: text;">Output</form>
+                </div>
+                <br>
+            </div>
+        </center>
+    </div>
 </body>
 </html>
 
 
 <script>
-    document.onload = syncreplaces()
+    document.onload = syncreplaces(),replacer()
 
     document.addEventListener("drop", function(ev){
         customreplace(event)
@@ -83,7 +116,7 @@
             let file = ev.dataTransfer.files[0]
             let reader = new FileReader()
             reader.onload = function(event){
-                replaces = event.target.result.replace(/(\r)/g, "")
+                replaces = event.target.result.replace(/\r/g, "")
                 document.getElementById("embedreplace").value = replaces
             }
             reader.readAsText(file)
@@ -112,10 +145,10 @@
         })
     }
 
+
     function changereplace(){
         let newdata = document.getElementById("embedreplace").value
         replaces = newdata
-        // console.log(replaces)
     }
 
     let regex = "config:any regi:"
@@ -142,7 +175,6 @@
                 } else {
                     if(alphabet.includes(x)){
                         if(num === 0 || nomatch.includes(regexarr[num-1])){
-                            console.log(replaces.split("\n")[alphabet.indexOf(x)].split(" ")[0])
                             regexarr.push(`[${replaces.split("\n")[alphabet.indexOf(x)].split(" ")[0]}]+[\\W_]*`)
                         } else {
                             regexarr.push(`+[${replaces.split("\n")[alphabet.indexOf(x)].split(" ")[0]}]+[\\W_]*`)
@@ -186,5 +218,32 @@
         setTimeout(() => {
             document.getElementById("regexcopyraw").style.backgroundColor = colorfirsta
         }, 3000)
+    }
+
+    function replacer(){
+        let replacer = " "
+        if(document.getElementById("replacer").value.length > 0){
+            replacer = document.getElementById("replacer").value
+        }
+    
+        let replacetext = "Lorem ipsum..."
+        if(document.getElementById("replacetext").value.length > 0){
+            replacetext = document.getElementById("replacetext").value
+        }
+
+        let changer = ""
+        if(document.getElementById("changer").value.length > 0){
+            changer = document.getElementById("changer").value
+        }
+
+        let caseinsensitive = 0
+        let ignorespaces = 0
+        
+
+        let output = replacetext.replace(RegExp(replacer.toString(), "g"), changer)
+        // console.log(replacetext, replacer, changer)
+
+        document.getElementById("replaceoutput").innerHTML = output
+
     }
 </script>
