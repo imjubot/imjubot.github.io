@@ -160,7 +160,7 @@
     let regexarr = []
     let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
     let nomatch = ["(", ")", "[", "]", "{", "}", ":", "$", "+", "*", "?", "\\s", "\\", "|", "^", "-", ">", "<", ".", "?#", "?&", "?P=", "?P>", "?<=", "?<!", "?=", "\\w", "\\b"]
-    let matchextra = [":", ".", "+", "*", "?", "\\"]
+    let matchextra = ["[", "(", "{"]
 
     function submitregex(){
         let regextext = document.getElementById("textinput").value
@@ -178,24 +178,24 @@
                         regexarr.push("+\\s*")
                     }
                 } else {
-                    if(alphabet.includes(x)){
-                        if(num === 0 || nomatch.includes(regexarr[num-1])){
-                            regexarr.push(`([${replaces.split("\n")[alphabet.indexOf(x)].split(" ")[0]}][\\W_]*?)`)
-                        } else {
-                            regexarr.push(`+([${replaces.split("\n")[alphabet.indexOf(x)].split(" ")[0]}][\\W_]*?)`)
-                        }
+                    if(x === "\\" || regexarr[num-1] === "\\"){
+                        regexarr.push(x)
                     } else {
-                        if(num === 0 || nomatch.includes(regexarr[num-1])){
-                            if(nomatch.includes(x)){
-                                regexarr.push(x)
+                        if(alphabet.includes(x)){
+                            if(num === 0 || nomatch.includes(regexarr[num-1]) || nomatch.includes(x)){
+                                regexarr.push(`([${replaces.split("\n")[alphabet.indexOf(x)].split(" ")[0]}][\\W_]*?)`)
                             } else {
-                                regexarr.push(`(${x}[\\W_]*?)`)
+                                regexarr.push(`+([${replaces.split("\n")[alphabet.indexOf(x)].split(" ")[0]}][\\W_]*?)`)
                             }
                         } else {
-                            if(nomatch.includes(x)){
+                            if(num === 0 || nomatch.includes(x)){
                                 regexarr.push(x)
                             } else {
-                                regexarr.push(`+(${x}[\\W_]*?)`)
+                                if(nomatch.includes(regexarr[num-1]) && !isNaN(parseInt(x))){
+                                    regexarr.push(x)
+                                } else {
+                                    regexarr.push(`(${x}[\\W_]*?)`)
+                                }
                             }
                         }
                     }
