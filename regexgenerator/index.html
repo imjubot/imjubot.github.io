@@ -174,6 +174,7 @@
     }
 
     let regexarr = []
+    let regexarra = []
     let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
     let alphabetupper = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
     let nomatch = ["(", ")", "[", "]", "{", "}", ":", "$", "+", "*", "?", "\\s", "\\", "|", "^", "-", ">", "<", ".", "?#", "?&", "?P=", "?P>", "?<=", "?<!", "?=", "\\w", "\\b"]
@@ -182,6 +183,7 @@
     function submitregex(){
         let regextext = document.getElementById("textinput").value
         regexarr = []
+        regexarra = []
         if(regextext.length > 0){
             let num = 0
             regextext.split("").forEach(x => {
@@ -189,32 +191,30 @@
                 //     x = x.toLowerCase()
                 // }
                 if(x === " "){
-                    if(num === 0 || nomatch.includes(regexarr[num-1])){
-                        regexarr.push("\\s*")
-                    } else {
-                        if(regexarr[num-1].endsWith("[\\W_]*?)")){
-                            // regexarr[num-1] = regexarr[num-1].split("[\\W_]*?)")[0]
-                        } 
-                        regexarr.push("\\s*+")
-                    }
+                    regexarr.push("\\s*+")
+                    regexarra.push("\\s*+")
                 } else {
                     if(x === "\\" || regexarr[num-1] === "\\"){
                         regexarr.push(x)
+                        regexarra.push(x)
                     } else {
                         if(alphabet.includes(x)){
-                            // alert("lower")
                             regexarr.push(`([${replaces.split("\n")[alphabet.indexOf(x)]}][\\W_]*?)+`)
+                            regexarra.push(`([${replaces.split("\n")[alphabet.indexOf(x)]}]\!)+`)
                         } else if(alphabetupper.includes(x)){
-                            // alert("upper")
                             regexarr.push(`([${replaces.split("\n")[alphabetupper.indexOf(x)]}][\\W_]*?)+`)
+                            regexarra.push(`([${replaces.split("\n")[alphabetupper.indexOf(x)]}]\!)+`)
                         } else {
                             if(num === 0 || nomatch.includes(x)){
                                 regexarr.push(x)
+                                regexarra.push(x)
                             } else {
                                 if(nomatch.includes(regexarr[num-1]) && !isNaN(parseInt(x))){
                                     regexarr.push(x)
+                                    regexarra.push(x)
                                 } else {
                                     regexarr.push(`(${x}[\\W_]*?)+`)
+                                    regexarra.push(`(${x}\!)+`)
                                 }
                             }
                         }
@@ -231,19 +231,23 @@
 
             if(checkwordw() !== ""){
                 regexarr.unshift(checkwordw())
+                regexarra.unshift(checkwordbw())
                 regexarr.push(checkwordw())
+                regexarra.push(checkwordbw())
             }
 
             if(checkwordb() !== ""){
                 regexarr.unshift(checkwordb())
+                regexarra.unshift(checkwordb())
                 regexarr.push(checkwordb())
+                regexarra.push(checkwordb())
             }
 
             // if(checkregi() !== ""){
                 // regexarr.unshift(checkregi())
             // }
 
-            document.getElementById("regexoutput").innerHTML = `config:any reg${checkregia()}:${regexarr.join("")}`
+            document.getElementById("regexoutput").innerHTML = `config:any reg${checkregia()}:${regexarra.join("")}`
             document.getElementById("regexrawoutput").innerHTML = `${checkregi()}${regexarr.join("")}`
         } else {
             regexarr = []
