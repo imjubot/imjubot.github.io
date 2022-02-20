@@ -198,36 +198,53 @@
             let num = 0;
             let regignore = 0;
             regextext.split("").forEach(x => {
+                regexarrraw.push(x)
                 if(x === " "){
                     regexarr.push("\\s*+");
                     regexarra.push("\\s*+");
                 } else {
-                    if(nomatchgroup.includes(x)){
-                        regignore = 1;
-                    } else if(nomatchgroupa.includes(x)){
-                        regignore = 0;
-                    } 
+                    let lastx = regexarrraw[num-1];
+                    console.log(lastx, regexarrraw)
                     if(nomatchstart.includes(x)){
                         if(num > 0){
-                            let lastx = regexarrraw.pop();
+                            regignore = 3
                             regexarr.pop();
                             regexarra.pop();
                             if(nomatch.includes(lastx)){
                                 regexarr.push(lastx + x + "+")
                                 regexarra.push(lastx + x + "+")
-                                regexarrraw.push(lastx + x)
                             } else {
                                 regexarr.push(`([${lastx}]${x}[\\W_]*?)+`)
                                 regexarra.push(`([${lastx}]${x}\\!?)+`)
-                                regexarrraw.push(lastx + x)
                             }
                         }
-                    } else {
-                        regexarrraw.push(x)
+                    } else if(nomatchgroup.includes(x) || nomatchgroup.includes(regexarrraw[num-1])){
+                        regignore = 1;
+                    } else if(nomatchgroupa.includes(x)){
+                        regignore = 2;
+                    } else if((numbers.includes(x)) && (nomatchgroup.includes(regexarrraw[num-1]))){
+                        alert("num")
+                        regignore = 1;
                     }
-                    if(x === "\\" || regexarr[num-1] === "\\" || regignore === 1){
-                        regexarr.push(x)
-                        regexarra.push(x)
+                    if(x === "\\" || regexarr[num-1] === "\\" || regignore > 1){
+                        if((regignore === 1) || (regignore === 2)){
+                            regexarr.pop();
+                            regexarra.pop();
+                            if(nomatch.includes(lastx)){
+                                regexarr.push(lastx + x + "+")
+                                regexarra.push(lastx + x + "+")
+                            } else {
+                                regexarr.push(`([${lastx}]${x}[\\W_]*?)+`)
+                                regexarra.push(`([${lastx}]${x}\\!?)+`)
+                            }
+                            if(regignore === 2){
+                                regignore = 0
+                            }
+                        } else {
+                            // regexarr.push(x)
+                            // regexarra.push(x)
+                        }
+                        // console.log(regexarrraw)
                     } else {
                         // regexarrraw.push(x)
                         if(alphabet.includes(x)){
