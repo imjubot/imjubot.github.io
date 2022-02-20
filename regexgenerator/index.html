@@ -192,30 +192,25 @@
     function submitregex(){
         let regextext = document.getElementById("textinput").value;
         regexarr = [];
-        regexarra = [];
         regexarrraw = [];
         if(regextext.length > 0){
             let num = 0;
             let regignore = 0;
             regextext.split("").forEach(x => {
-                regexarrraw.push(x)
+                
                 if(x === " "){
                     regexarr.push("\\s*+");
-                    regexarra.push("\\s*+");
                 } else {
-                    let lastx = regexarrraw[num-1];
+                    let lastx = regexarrraw[num];
                     console.log(lastx, regexarrraw)
                     if(nomatchstart.includes(x)){
                         if(num > 0){
                             regignore = 3
                             regexarr.pop();
-                            regexarra.pop();
                             if(nomatch.includes(lastx)){
                                 regexarr.push(lastx + x + "+")
-                                regexarra.push(lastx + x + "+")
                             } else {
                                 regexarr.push(`([${lastx}]${x}[\\W_]*?)+`)
-                                regexarra.push(`([${lastx}]${x}\\!?)+`)
                             }
                         }
                     } else if(nomatchgroup.includes(x) || nomatchgroup.includes(regexarrraw[num-1])){
@@ -229,44 +224,34 @@
                     if(x === "\\" || regexarr[num-1] === "\\" || regignore > 1){
                         if((regignore === 1) || (regignore === 2)){
                             regexarr.pop();
-                            regexarra.pop();
                             if(nomatch.includes(lastx)){
                                 regexarr.push(lastx + x + "+")
-                                regexarra.push(lastx + x + "+")
                             } else {
                                 regexarr.push(`([${lastx}]${x}[\\W_]*?)+`)
-                                regexarra.push(`([${lastx}]${x}\\!?)+`)
                             }
                             if(regignore === 2){
                                 regignore = 0
                             }
                         } else {
                             // regexarr.push(x)
-                            // regexarra.push(x)
                         }
                         // console.log(regexarrraw)
                     } else {
                         // regexarrraw.push(x)
                         if(alphabet.includes(x)){
                             regexarr.push(`([${replaces.split("\n")[alphabet.indexOf(x)]}][\\W_]*?)+`)
-                            regexarra.push(`([${replaces.split("\n")[alphabet.indexOf(x)]}]\\!?)+`)
                         } else if(alphabetupper.includes(x)){
                             regexarr.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.indexOf(x)]}][\\W_]*?)+`)
-                            regexarra.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.indexOf(x)]}]\\!?)+`)
                         } else if(numbers.includes(x)){
                             regexarr.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.length+numbers.indexOf(x)]}][\\W_]*?)+`)
-                            regexarra.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.length+numbers.indexOf(x)]}]\\!)+`)
                         } else {
                             if(num === 0 || nomatch.includes(x)){
                                 regexarr.push(x)
-                                regexarra.push(x)
                             } else {
                                 if(nomatch.includes(regexarr[num-1]) && !isNaN(parseInt(x))){
                                     regexarr.push(x)
-                                    regexarra.push(x)
                                 } else {
                                     regexarr.push(`(${x}[\\W_]*?)+`)
-                                    regexarra.push(`(${x}\\!?)+`)
                                 }
                             }
                         }
@@ -283,23 +268,19 @@
 
             if(checkwordw() !== ""){
                 regexarr.unshift(checkwordw())
-                regexarra.unshift(checkwordbw())
                 regexarr.push(checkwordw())
-                regexarra.push(checkwordbw())
             }
 
             if(checkwordb() !== ""){
                 regexarr.unshift(checkwordb())
-                regexarra.unshift(checkwordb())
                 regexarr.push(checkwordb())
-                regexarra.push(checkwordb())
             }
 
             // if(checkregi() !== ""){
                 // regexarr.unshift(checkregi())
             // }
 
-            document.getElementById("regexoutput").innerHTML = `config:any reg${checkregia()}:${regexarra.join("")}`
+            document.getElementById("regexoutput").innerHTML = `config:any reg${checkregia()}:${regexarr.join("")}`
             document.getElementById("regexrawoutput").innerHTML = `${checkregi()}${regexarr.join("")}`
         } else {
             regexarr = []
