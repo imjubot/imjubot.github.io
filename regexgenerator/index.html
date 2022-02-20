@@ -23,6 +23,8 @@
                 <input id="regi" type="checkbox" checked onclick="submitregex()"><h>Case Insensitive</h> - <input id="regb" type="checkbox" checked onclick="submitregex()"><h>Word \b</h> - <input id="regw" type="checkbox" onclick="submitregex()"><h>Word \w</h>
                 <br>
                 <input id="replacelower" type="checkbox" onclick="submitregex()"><h>Use Lower Replaces</h> - <input id="replaceupper" type="checkbox" onclick="submitregex()"><h>Use Upper Replaces</h>
+                <br>
+                <input id="anystart" type="checkbox" onclick="submitregex()"><h>Any Start</h> - <input id="anyend" type="checkbox" onclick="submitregex()"><h>Any End </h>
             </center>
         </div>
     </div>
@@ -291,6 +293,16 @@
             function checkwordb(){return document.getElementById("regb").checked === true ? "\\b" : ""}
             function checkwordw(){return document.getElementById("regw").checked === true ? "\\w" : ""}
             function checkwordbw(){return checkwordb() + checkwordw()}
+            function checkanystart(){return document.getElementById("anystart").checked === true ? ".*" : ""}
+            function checkanyend(){return document.getElementById("anyend").checked === true ? ".*" : ""}
+
+            if(checkanystart() !== ""){
+                regexarr.unshift(checkanystart())
+            }
+
+            if(checkanyend() !== ""){
+                regexarr.push(checkanyend())
+            }
 
             if(checkwordw() !== ""){
                 regexarr.unshift(checkwordw())
