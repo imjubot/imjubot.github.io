@@ -20,6 +20,8 @@
         <div id="regopts" style="text-transform: none; font-size: 15px;">
             <center>
                 <input id="regi" type="checkbox" checked onclick="submitregex()"><h>Case Insensitive</h> - <input id="regb" type="checkbox" checked onclick="submitregex()"><h>Word \b</h> - <input id="regw" type="checkbox" onclick="submitregex()"><h>Word \w</h>
+                <br>
+                <input id="replacelower" type="checkbox" onclick="submitregex()"><h>Use Lower Replaces</h> - <input id="replaceupper" type="checkbox" onclick="submitregex()"><h>Use Upper Replaces</h>
             </center>
         </div>
     </div>
@@ -137,7 +139,8 @@
             reader.onload = function(event){
                 replaces = event.target.result.replace(/\r/g, "")
                 document.getElementById("embedreplace").value = replaces
-                setCookie("replaces", replaces, 365)
+                submitregex()
+                // setCookie("replaces", replaces, 365)
             }
             reader.readAsText(file)
             // console.log(file)
@@ -151,7 +154,7 @@
     
     function syncreplaces(){
         if(getCookie("replaces") !== ""){
-            replaces = getCookie("replaces")
+            // replaces = getCookie("replaces")
         }
         fetch("./replaces.txt")
         .then(data => {
@@ -171,12 +174,14 @@
     function changereplace(){
         let newdata = document.getElementById("embedreplace").value
         replaces = newdata
+        submitregex()
     }
 
     let regexarr = []
     let regexarra = []
     let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
     let alphabetupper = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
+    let numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
     let nomatch = ["(", ")", "[", "]", "{", "}", ":", "$", "+", "*", "?", "\\s", "\\", "|", "^", "-", ">", "<", ".", "?#", "?&", "?P=", "?P>", "?<=", "?<!", "?=", "\\w", "\\b"]
     let matchextra = ["[", "(", "{"]
 
@@ -202,8 +207,11 @@
                             regexarr.push(`([${replaces.split("\n")[alphabet.indexOf(x)]}][\\W_]*?)+`)
                             regexarra.push(`([${replaces.split("\n")[alphabet.indexOf(x)]}]\\!)+`)
                         } else if(alphabetupper.includes(x)){
-                            regexarr.push(`([${replaces.split("\n")[alphabetupper.indexOf(x)]}][\\W_]*?)+`)
-                            regexarra.push(`([${replaces.split("\n")[alphabetupper.indexOf(x)]}]\\!)+`)
+                            regexarr.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.indexOf(x)]}][\\W_]*?)+`)
+                            regexarra.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.indexOf(x)]}]\\!)+`)
+                        } else if(numbers.includes(x)){
+                            regexarr.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.length+numbers.indexOf(x)]}][\\W_]*?)+`)
+                            regexarra.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.length+numbers.indexOf(x)]}]\\!)+`)
                         } else {
                             if(num === 0 || nomatch.includes(x)){
                                 regexarr.push(x)
@@ -257,7 +265,7 @@
     }
     
     function copyregex(){
-        navigator.clipboard.writeText(`config:any reg${checkregia()}:${regexarr.join("")}`);
+        navigator.clipboard.writeText(document.getElementById("regexoutput").innerHTML);
         let colorfirst = document.getElementById("regexcopy").style.backgroundColor
         document.getElementById("regexcopy").style.backgroundColor = "green"
         setTimeout(() => {
@@ -266,7 +274,7 @@
     }
 
     function copyregexraw(){
-        navigator.clipboard.writeText(`${regexarr.join("")}`);
+        navigator.clipboard.writeText(document.getElementById("regexrawoutput").innerHTML);
         let colorfirsta = document.getElementById("regexcopyraw").style.backgroundColor
         document.getElementById("regexcopyraw").style.backgroundColor = "green"
         setTimeout(() => {
