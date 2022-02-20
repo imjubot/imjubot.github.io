@@ -177,38 +177,65 @@
         submitregex()
     }
 
-    let regexarr = []
-    let regexarra = []
-    let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"]
-    let alphabetupper = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"]
-    let numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
-    let nomatch = ["(", ")", "[", "]", "{", "}", ":", "$", "+", "*", "?", "\\s", "\\", "|", "^", "-", ">", "<", ".", "?#", "?&", "?P=", "?P>", "?<=", "?<!", "?=", "\\w", "\\b"]
-    let matchextra = ["[", "(", "{"]
+    let regexarr = [];
+    let regexarra = [];
+    let regexarrraw = [];
+    let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+    let alphabetupper = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+    let numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+    let nomatch = ["(", ")", "[", "]", "{", "}", ":", "$", "+", "*", "?", "\\s", "\\", "|", "^", "-", ">", "<", ".", "?#", "?&", "?P=", "?P>", "?<=", "?<!", "?=", "\\w", "\\b"];
+    let nomatchgroup = ["[", "{"];
+    let nomatchgroupa = ["]", "}"];
+    let nomatchstart = ["*", "+", ".", "-", "?"];
+    // let nomatch
 
     function submitregex(){
-        let regextext = document.getElementById("textinput").value
-        regexarr = []
-        regexarra = []
+        let regextext = document.getElementById("textinput").value;
+        regexarr = [];
+        regexarra = [];
+        regexarrraw = [];
         if(regextext.length > 0){
-            let num = 0
+            let num = 0;
+            let regignore = 0;
             regextext.split("").forEach(x => {
-                // if(checkregi() !== ""){
-                //     x = x.toLowerCase()
-                // }
                 if(x === " "){
-                    regexarr.push("\\s*+")
-                    regexarra.push("\\s*+")
+                    regexarr.push("\\s*+");
+                    regexarra.push("\\s*+");
                 } else {
-                    if(x === "\\" || regexarr[num-1] === "\\"){
+                    if(nomatchgroup.includes(x)){
+                        regignore = 1;
+                    } else if(nomatchgroupa.includes(x)){
+                        regignore = 0;
+                    } 
+                    if(nomatchstart.includes(x)){
+                        if(num > 0){
+                            let lastx = regexarrraw.pop();
+                            regexarr.pop();
+                            regexarra.pop();
+                            if(nomatch.includes(lastx)){
+                                regexarr.push(lastx + x + "+")
+                                regexarra.push(lastx + x + "+")
+                                regexarrraw.push(lastx + x)
+                            } else {
+                                regexarr.push(`([${lastx}]${x}[\\W_]*?)+`)
+                                regexarra.push(`([${lastx}]${x}\\!?)+`)
+                                regexarrraw.push(lastx + x)
+                            }
+                        }
+                    } else {
+                        regexarrraw.push(x)
+                    }
+                    if(x === "\\" || regexarr[num-1] === "\\" || regignore === 1){
                         regexarr.push(x)
                         regexarra.push(x)
                     } else {
+                        // regexarrraw.push(x)
                         if(alphabet.includes(x)){
                             regexarr.push(`([${replaces.split("\n")[alphabet.indexOf(x)]}][\\W_]*?)+`)
-                            regexarra.push(`([${replaces.split("\n")[alphabet.indexOf(x)]}]\\!)+`)
+                            regexarra.push(`([${replaces.split("\n")[alphabet.indexOf(x)]}]\\!?)+`)
                         } else if(alphabetupper.includes(x)){
                             regexarr.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.indexOf(x)]}][\\W_]*?)+`)
-                            regexarra.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.indexOf(x)]}]\\!)+`)
+                            regexarra.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.indexOf(x)]}]\\!?)+`)
                         } else if(numbers.includes(x)){
                             regexarr.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.length+numbers.indexOf(x)]}][\\W_]*?)+`)
                             regexarra.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.length+numbers.indexOf(x)]}]\\!)+`)
@@ -222,7 +249,7 @@
                                     regexarra.push(x)
                                 } else {
                                     regexarr.push(`(${x}[\\W_]*?)+`)
-                                    regexarra.push(`(${x}\\!)+`)
+                                    regexarra.push(`(${x}\\!?)+`)
                                 }
                             }
                         }
