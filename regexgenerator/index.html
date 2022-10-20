@@ -325,7 +325,7 @@
 
             document.getElementById("regexoutput").value = `config:any reg${checkregia()}:${regexarr.join("")}`;
             document.getElementById("regexrawoutput").value = `${checkregi()}${regexarr.join("")}`;
-            document.getElementById("regexjsoutput").value = `${checkregi()}${regexarr.join("")}`;
+            document.getElementById("regexjsoutput").value = `${checkregi()}${regexarr.join("").replace(/[\\]/g, "\\\\")}`;
 
             let regex = `${regexarrreg.join("")}`
             document.getElementById("testarea").value.split("\n").forEach(x => {
