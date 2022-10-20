@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>RegexGenerator</title>
+    <link rel="icon" href="../../src/favicon.ico" type="image/x-icon">
+</head>
+<body style="background-color: #1d3956; color: mediumseagreen; font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif; text-transform: uppercase; font-size: 20px;">
+    <div>
+        <center>
+            <h1>
+                Regex Generator
+            </h1>
+        </center>
+    </div>
+    <div class="input" style="user-select: none;">
+        <center>
+            <input id="textinput" type="text" placeholder="Insert Text" minlength="1" oninput="submitregex()">
+        </center>
+        <br>
+        <div id="regopts" style="text-transform: none; font-size: 15px;">
+            <center>
+                <!-- <button class="buttonsettings" style="cursor: pointer; background-color: green; border: double;">Case Insensitive</button> -->
+                <input id="regi" type="checkbox" checked onclick="submitregex()"><h>Case Insensitive</h> - <input id="regb" type="checkbox" checked onclick="submitregex()"><h>Word \b</h> - <input id="regw" type="checkbox" onclick="submitregex()"><h>Word \w</h>
+                <br>
+                <input id="replacelower" type="checkbox" onclick="submitregex()"><h>Use Lower Replaces</h> - <input id="replaceupper" type="checkbox" onclick="submitregex()"><h>Use Upper Replaces</h>
+                <br>
+                <input id="anystart" type="checkbox" onclick="submitregex()"><h>Any Start</h> - <input id="anyend" type="checkbox" onclick="submitregex()"><h>Any End </h>
+            </center>
+        </div>
+    </div>
+    <br>
+    <div style="border: solid; padding: 10px; display: inline-block; width: 900px;">
+        <center>
+            <textarea id="regexoutput" style="text-transform: none; background-color: darkcyan; width: 800px; height: 45px; user-select: text; max-width: 880px; max-height: 200px; min-height: 45px; min-width: 880px;" spellcheck="false">
+                Loading...
+            </textarea>
+            <br>
+            <button id="regexcopy" onclick="copyregex()" style="cursor: pointer;">
+                Copy Regex
+            </button>
+            <br>
+            <br>
+            <textarea id="regexrawoutput" style="text-transform: none; background-color: darkcyan; width: 800px; height: 45px; user-select: text; max-width: 880px; max-height: 200px; min-height: 45px; min-width: 880px;" spellcheck="false">
+                Loading...
+            </textarea>
+            <br>
+            <button id="regexcopyraw" onclick="copyregexraw()" style="cursor: pointer;">
+                Copy Raw Regex
+            </button>
+            <br>
+            <br>
+            <textarea id="regexjsoutput" style="text-transform: none; background-color: darkcyan; width: 800px; height: 45px; user-select: text; max-width: 880px; max-height: 200px; min-height: 45px; min-width: 880px;" spellcheck="false">
+                Loading...
+            </textarea>
+            <br>
+            <button id="regexcopyjs" onclick="copyregexjs()" style="cursor: pointer;">
+                Copy JS Regex
+            </button>
+            <br>
+        </center>
+    </div>
+    <br>
+    <div style="border: solid; padding: 10px; border-top: none; width: 800px; display: none; user-select: none; text-transform: none;" >
+        <center>
+            <h style="text-decoration: underline;">Matches:</h>
+            <br><br>
+            <textarea id="testarea" style="width: 250px; background-color: darkcyan; border: double;" spellcheck="false" oninput="submitregex()"></textarea>
+            <textarea id="testareaout" style="width: 50px; background-color: darkcyan; border: double; user-select: none;" spellcheck="false" >false</textarea>
+        </center>
+    </div>
+    <div style="user-select: none; float: left; width: 50%;">
+        <center>
+        <h3 style="text-decoration: underline;">Lookalikes:</h3>
+        <h>Usage:</h>
+        <br>
+        <h>1. <a href="./replaces.txt" download="replaces.txt">Download the Standard File</a></h>
+        <br>
+        <h>2. Drop your edited File on this page</h>
+        <br>
+        <br>
+        <h>Replaces:</h>
+        <br><br>
+        <textarea id="embedreplace" style="height: 800px; width: 300px; background-color: darkcyan; max-width: 450px; min-width: 300px; max-height: 1000px; min-height: 300px; border: double; border-radius: 3px; " oninput="changereplace()" spellcheck="false">Loading Replaces..</textarea>
+        <br><br>
+        <button style="background-color: red;" onclick="resetreplace()">Reset Replaces</button>
+        </center>
+    </div>
+    <div style="user-select: none; float: right; width: 50%;">
+        <center>
+            <h3 style="text-decoration: underline;">Extras:</h3>
+            <div style="border: double; padding: 10px; padding-top: 5px; padding-bottom: 5px; display: inline-block; ">
+                <div style="float: left;">
+                    <br>
+                    <h style="text-decoration: underline; ">Replacer:</h>
+                    <input id="replacer" type="text" style="width: 203px; background-color: aquamarine; border: none;" placeholder="Leave Empty for nothing" oninput="replacer()">
+                </div>
+                <br>
+                <div style="float: left;">
+                    <h style="text-decoration: underline;">Changer:</h>
+                    <input id="changer" type="text" style="width: 207px; background-color: darkcyan; border: none;" placeholder="Leave Empty for nothing" oninput="replacer()">
+                </div>
+                <br>
+                <div style="float: left;">
+                    <h style="text-decoration: underline;">Text:</h>
+                    <input id="replacetext" type="text" style="width: 250px; background-color: aquamarine; border: none;" placeholder="Lorem ipsum..." oninput="replacer()">
+                </div>
+                <br>
+                <div style="text-transform: none; font-size: 15px;">
+                    <input id="caseinsensitive" type="checkbox" oninput="checkbox(this)"><h>Case Insensitive</h>
+                    <br>
+                    <input id="ignorespaces" type="checkbox"><h>Ignore Spaces</h>
+                </div>
+                <br>
+                <div>
+                    <form id="replaceoutput" style="text-transform: none; user-select: text;">Output</form>
+                </div>
+                <br>
+            </div>
+        </center>
+    </div>
+</body>
+</html>
+
+<style>
+    .buttonsettings {
+        transform: scale(1);
+        transition: tranform 250ms;
+    }
+    .buttonsettings:active {
+        transform: scale(1.02);
+        transition: transform 125ms;
+    }
+</style>
+
+<script>
+    document.onload = syncreplaces(),replacer()
+    setTimeout(() => {
+        submitregex()
+    }, 1000)
+    document.getElementById("testarea").innerHTML = "TestString\nTest String\n-Test String-"
+    document.getElementById("testareaout").innerHTML = "-\n-\n-"
+
+    document.addEventListener("drop", function(ev){
+        customreplace(event)
+    })
+
+    document.addEventListener("dragover", function(ev){
+        customdrag(event)
+    })
+
+    let replaces = ""
+
+    function resetreplace(){
+        syncreplaces()
+    }
+    
+    function customreplace(ev){
+        // console.log("file dropped")
+        ev.preventDefault();
+        if(ev.dataTransfer.items[0].type === "text/plain"){
+            let file = ev.dataTransfer.files[0]
+            let reader = new FileReader()
+            reader.onload = function(event){
+                replaces = event.target.result.replace(/\r/g, "")
+                document.getElementById("embedreplace").value = replaces
+                submitregex()
+                // setCookie("replaces", replaces, 365)
+            }
+            reader.readAsText(file)
+            // console.log(file)
+        }
+    }
+
+    function customdrag(ev){
+        // console.log("file dragged")
+        ev.preventDefault()
+    }
+    
+    function syncreplaces(){
+        if(getCookie("replaces") !== ""){
+            // replaces = getCookie("replaces")
+        }
+        fetch("./replaces.txt")
+        .then(data => {
+            data.text().then(x => {
+                // console.log(x)
+                replaces = x.replace(/(\r)/g, "")
+                document.getElementById("embedreplace").value = x.replace(/(\r)/g, "")
+                console.log("Successfully Fetched Lookalikes")
+            })
+        })
+        .catch(err => {
+            location.reload()
+            console.log("Failed to Fetch Lookalikes - Reloading")
+        })
+    }
+
+    function changereplace(){
+        let newdata = document.getElementById("embedreplace").value
+        replaces = newdata
+        submitregex()
+    }
+
+    let regexarr = [];
+    let regexarra = [];
+    let regexarrraw = [];
+    let alphabet = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z"];
+    let alphabetupper = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
+    let numbers = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+    let nomatch = ["(", ")", "[", "]", "{", "}", ":", "$", "+", "*", "?", "\\s", "\\", "|", "^", "-", ">", "<", ".", "?#", "?&", "?P=", "?P>", "?<=", "?<!", "?=", "\\w", "\\b"];
+    let nomatchgroup = ["[", "{"];
+    let nomatchgroupa = ["]", "}"];
+    let nomatchstart = ["*", "+", ".", "-", "?"];
+    // let nomatch
+
+    function submitregex(){
+        let regextext = document.getElementById("textinput").value;
+        regexarr = [];
+        regexarrraw = [];
+        if(regextext.length > 0){
+            let num = 0;
+            let regignore = 0;
+            let regnum = [];
+            regextext.split("").forEach(x => {
+                regexarrraw.push(x)
+                let lastx = regexarrraw[num-1];
+                if(x === " "){
+                    regexarr.push("\\s+");
+                } else {
+                    // console.log(regexarrraw)
+                    if(nomatchstart.includes(x)){
+                        if(num > 0){
+                            regignore = 3
+                            regexarr.pop();
+                            if(nomatch.includes(lastx)){
+                                regexarr.push(`${lastx}${x}`)
+                            } else {
+                                regexarr.push(`([${lastx}]${x}[\\W_]*?)+`)
+                            }
+                        }
+                    } else if(nomatchgroup.includes(x) || nomatchgroup === 0){
+                        regignore = 1;
+                    } else if(nomatchgroupa.includes(x)){
+                        regignore = 2;
+                    } 
+                    if(x === "\\" || regexarr[num-1] === "\\" || regignore > 1){
+                        if((regignore === 1) || (regignore === 2)){
+                            
+                            regexarr.pop();
+                            if(nomatch.includes(lastx)){
+                                regexarr.push(`${lastx}${x}+`)
+                            } else {
+                                if(numbers.includes(x)){
+                                    regexarr.pop();
+                                    regexarr.push(`([${lastx}]{${x}}[\\W_]*?)+`)
+                                } else {
+                                    regexarr.push(`([${lastx}]${x}[\\W_]*?)+`)
+                                }
+                            }
+                            if(regignore === 2){
+                                let lastx2 = regexarrraw[num-2]
+                                let lastx3 = regexarrraw[num-3]
+                                regexarr.pop();
+                                regexarr.pop();
+                                regexarr.pop();
+                                regexarr.push(`([${lastx3}]{${lastx}}[\\W_]*?)+`)
+
+                                regignore = 0
+                            }
+                        } else {
+                            regignore = 0
+                            // regexarr.push(x)
+                        }
+                        console.log(regexarr)
+                    } else {
+                        if(alphabet.includes(x)){
+                            regexarr.push(`([${replaces.split("\n")[alphabet.indexOf(x)]}][\\W_]*?)+`)
+                        } else if(alphabetupper.includes(x)){
+                            regexarr.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.indexOf(x)]}][\\W_]*?)+`)
+                        } else if(numbers.includes(x)){
+                            regexarr.push(`([${replaces.split("\n")[alphabet.length+alphabetupper.length+numbers.indexOf(x)]}][\\W_]*?)+`)
+                        } else {
+                            if(num === 0 || nomatch.includes(x)){
+                                regexarr.push(x)
+                            } else {
+                                if(nomatch.includes(regexarr[num-1]) && !isNaN(parseInt(x))){
+                                    regexarr.push(x)
+                                } else {
+                                    regexarr.push(`(${x}[\\W_]*?)+`)
+                                }
+                            }
+                        }
+                    }
+                }
+                num++
+            })
+
+            let regexarrreg = regexarr
+
+            function checkregi(){return document.getElementById("regi").checked === true ? "(?i)" : ""}
+            function checkregia(){return document.getElementById("regi").checked === true ? "i" : ""}
+            function checkwordb(){return document.getElementById("regb").checked === true ? "\\b" : ""}
+            function checkwordw(){return document.getElementById("regw").checked === true ? "\\w" : ""}
+            function checkwordbw(){return checkwordb() + checkwordw()}
+            function checkanystart(){return document.getElementById("anystart").checked === true ? ".*" : ""}
+            function checkanyend(){return document.getElementById("anyend").checked === true ? ".*" : ""}
+
+            if(checkanystart() !== ""){
+                regexarr.unshift(checkanystart())
+            }
+
+            if(checkanyend() !== ""){
+                regexarr.push(checkanyend())
+            }
+
+            if(checkwordw() !== ""){
+                regexarr.unshift(checkwordw())
+                regexarr.push(checkwordw())
+            }
+
+            if(checkwordb() !== ""){
+                regexarr.unshift(checkwordb())
+                regexarr.push(checkwordb())
+            }
+
+            document.getElementById("regexoutput").value = `config:any reg${checkregia()}:${regexarr.join("")}`;
+            document.getElementById("regexrawoutput").value = `${checkregi()}${regexarr.join("")}`;
+            document.getElementById("regexjsoutput").value = `${checkregi()}${regexarr.join("")}`;
+
+            let regex = `${regexarrreg.join("")}`
+            document.getElementById("testarea").value.split("\n").forEach(x => {
+                console.log(x)
+                checkregex(x, regex, "")
+            })
+
+            function checkregex(crtext, crregex, crreplace){
+                if(checkregia() === "i"){
+                    let testareaouta = document.getElementById("testareaout").innerHTML
+                    crtext = crtext.replace(crtext.match(new RegExp(crregex, "gi")), "")
+                    console.log(crtext.match(new RegExp(crregex, "gi")))
+                } else {
+                    console.log(crtext.match(new RegExp(crregex, "g")))
+                }
+            }
+            
+        } else {
+            regexarr = []
+            document.getElementById("regexoutput").innerHTML = "Regex shows up here"
+            document.getElementById("regexrawoutput").innerHTML = "Raw Regex shows up here"
+        }
+    }
+    
+    function copyregex(){
+        navigator.clipboard.writeText(document.getElementById("regexoutput").innerHTML);
+        let colorfirst = document.getElementById("regexcopy").style.backgroundColor
+        document.getElementById("regexcopy").style.backgroundColor = "green"
+        setTimeout(() => {
+            document.getElementById("regexcopy").style.backgroundColor = colorfirst
+        }, 3000)
+    }
+
+    function copyregexraw(){
+        navigator.clipboard.writeText(document.getElementById("regexrawoutput").innerHTML);
+        let colorfirsta = document.getElementById("regexcopyraw").style.backgroundColor
+        document.getElementById("regexcopyraw").style.backgroundColor = "green"
+        setTimeout(() => {
+            document.getElementById("regexcopyraw").style.backgroundColor = colorfirsta
+        }, 3000)
+    }
+    
+    function copyjsregex(){
+        navigator.clipboard.writeText(document.getElementById("regexjsoutput").innerHTML);
+        let colorfirsta = document.getElementById("regexcopyjs").style.backgroundColor
+        document.getElementById("regexcopyjs").style.backgroundColor = "green"
+        setTimeout(() => {
+            document.getElementById("regexcopyjs").style.backgroundColor = colorfirsta
+        }, 3000)
+    }
+
+    function replacer(){
+        let replacer = " "
+        if(document.getElementById("replacer").value.length > 0){
+            replacer = document.getElementById("replacer").value
+        }
+    
+        let replacetext = "Lorem ipsum..."
+        if(document.getElementById("replacetext").value.length > 0){
+            replacetext = document.getElementById("replacetext").value
+        }
+
+        let changer = ""
+        if(document.getElementById("changer").value.length > 0){
+            changer = document.getElementById("changer").value
+        }
+        
+        if(document.getElementById("caseinsensitive").checked === true){
+            replacetext = replacetext.toLowerCase()
+            replacer = replacer.toLowerCase()
+        }
+
+        if(document.getElementById("ignorespaces").checked === true){
+            replacetext = replacetext.replace(/(\s)/g, "")
+            replacer = replacer.replace(/(\s)/g, "")
+        }
+
+        let output = replacetext.replace(RegExp(replacer.toString(), "g"), changer)
+        // console.log(replacetext, replacer, changer)
+
+        document.getElementById("replaceoutput").innerHTML = output
+    }
+
+    function checkbox(elem){
+        // alert(elem.checked)
+        replacer()
+    }
+
+    function setCookie(cname, cvalue, exdays) {
+        const d = new Date();
+        d.setTime(d.getTime() + (exdays*24*60*60*1000));
+        let expires = "expires="+ d.toUTCString();
+        document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    }
+
+    function getCookie(cname) {
+        let name = cname + "=";
+        let ca = document.cookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    }
+    
+    function checkCookie() {
+        let user = getCookie("username");
+        if(user !== ""){
+            alert("Welcome again " + user);
+        } else {
+            user = prompt("Please enter your name:", "");
+            if (user != "" && user != null) {
+                setCookie("username", user, 365);
+            }
+        }
+    } 
+
+
+</script>

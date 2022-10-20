@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "..\\jubewe.github.io-main\\src"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "regexgenerator"
+	}
+}
