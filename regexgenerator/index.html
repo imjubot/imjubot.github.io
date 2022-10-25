@@ -345,13 +345,14 @@
             
         } else {
             regexarr = []
-            document.getElementById("regexoutput").innerHTML = "Regex shows up here"
-            document.getElementById("regexrawoutput").innerHTML = "Raw Regex shows up here"
+            document.getElementById("regexoutput").innerHTML = "Regex shows up here";
+            document.getElementById("regexrawoutput").innerHTML = "Raw Regex shows up here";
+            document.getElementById("regexjsoutput").innerHTML = "JS Regex shows up here";
         }
     }
     
     function copyregex(){
-        navigator.clipboard.writeText(document.getElementById("regexoutput").innerHTML);
+        navigator.clipboard.writeText(document.getElementById("regexoutput").value);
         let colorfirst = document.getElementById("regexcopy").style.backgroundColor
         document.getElementById("regexcopy").style.backgroundColor = "green"
         setTimeout(() => {
@@ -360,7 +361,7 @@
     }
 
     function copyregexraw(){
-        navigator.clipboard.writeText(document.getElementById("regexrawoutput").innerHTML);
+        navigator.clipboard.writeText(document.getElementById("regexrawoutput").value);
         let colorfirsta = document.getElementById("regexcopyraw").style.backgroundColor
         document.getElementById("regexcopyraw").style.backgroundColor = "green"
         setTimeout(() => {
@@ -369,7 +370,7 @@
     }
     
     function copyjsregex(){
-        navigator.clipboard.writeText(document.getElementById("regexjsoutput").innerHTML);
+        navigator.clipboard.writeText(document.getElementById("regexjsoutput").value);
         let colorfirsta = document.getElementById("regexcopyjs").style.backgroundColor
         document.getElementById("regexcopyjs").style.backgroundColor = "green"
         setTimeout(() => {
